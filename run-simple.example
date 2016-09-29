@@ -1,0 +1,13 @@
+#!/bin/sh
+mvn compile exec:java \
+  -Dexec.mainClass=com.google.cloud.bqetl.BQETLSimple \
+  -Dexec.args="--project=#PROJECT \
+    --loadingBucketURL=gs://solutions-public-assets/bqetl \
+    --stagingLocation=#STAGING_BUCKET \
+    --runner=BlockingDataflowPipelineRunner \
+    --numWorkers=20 \
+    --maxNumWorkers=72 \
+    --bigQueryTablename=#PROJECT:#DATASET.#DESTINATION_TABLE\
+    --diskSizeGb=1000 \
+    --workerMachineType=n1-standard-1"
+

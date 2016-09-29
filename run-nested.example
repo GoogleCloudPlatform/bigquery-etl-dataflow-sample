@@ -1,0 +1,13 @@
+#!/bin/sh
+mvn compile exec:java \
+  -Dexec.mainClass=com.google.cloud.bqetl.BQETLNested \
+  -Dexec.args="--project=#PROJECT_NAME \
+    --loadingBucketURL=gs://solutions-public-assets/bqetl  \
+    --stagingLocation=#STAGING_BUCKET \
+    --runner=BlockingDataflowPipelineRunner \
+    --numWorkers=20 \
+    --maxNumWorkers=70 \
+    --bigQueryTablename=#PROJECT_NAME:#DATASET.#DESTINATION_TABLE \
+    --diskSizeGb=1000 \
+    --workerMachineType=n1-standard-1"
+
