@@ -383,8 +383,12 @@ public class MusicBrainzTransforms {
 
     PCollection<KV<Long, String>> entries = text.apply(MapElements.via((String input) -> {
       MusicBrainzDataObject object = JSONReader.readObject("", input);
-      Long key = (Long) object.getColumnValue(keyKeyName);
-      String value = (String) object.getColumnValue(valueKeyName);
+      logger.info("keyKeyName = ", keyKeyName);
+      logger.info("valueKeyName = ", valueKeyName);
+      logger.info("(Long) object.getColumnValue(keyKeyName) = ", (Long) object.getColumnValue(keyKeyName));
+      logger.info("(String) object.getColumnValue(valueKeyName) = ", (String) object.getColumnValue(valueKeyName));
+//      Long key = (Long) object.getColumnValue(keyKeyName);
+//      String value = (String) object.getColumnValue(valueKeyName);
       return KV.of((Long) object.getColumnValue(keyKeyName), (String) object.getColumnValue(valueKeyName));
     }).withOutputType(new TypeDescriptor<KV<Long, String>>() {
     }));
