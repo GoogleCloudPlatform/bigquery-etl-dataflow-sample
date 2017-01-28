@@ -128,8 +128,8 @@ public class BQETLNested {
         // [END schemaCodeChange]
         // [START schemaCodeChange2]
 /*Switch these two lines when using mapping table for artist_gender */
-        //        .stringField("artist_gender")
-        .intField("artist_gender")
+        .stringField("artist_gender")
+//        .intField("artist_gender")
         //[END schemaCodeChange2]
         .intField("artist_edits_pending")
         .timestampField("artist_last_updated")
