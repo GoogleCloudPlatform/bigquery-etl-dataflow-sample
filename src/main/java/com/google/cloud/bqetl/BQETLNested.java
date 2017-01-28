@@ -43,7 +43,8 @@ public class BQETLNested {
 
     // load the line delimited JSON into keyed PCollections
     PCollection<KV<Long, MusicBrainzDataObject>> artists = MusicBrainzTransforms.loadTable(p, "artist", "id",
-        MusicBrainzTransforms.lookup("area", "id", "name", "area", "begin_area"),
+        MusicBrainzTransforms.lookup("area", "id", "name", "area"),
+        //MusicBrainzTransforms.lookup("area", "id", "name", "area", "begin_area"),
         MusicBrainzTransforms.lookup("gender", "id", "name", "gender"));
         //MusicBrainzTransforms.lookup("gender", "gender", "id", "name"));
     PCollection<KV<Long, MusicBrainzDataObject>> artistCreditName = MusicBrainzTransforms.loadTable(p, "artist_credit_name", "artist_credit");
