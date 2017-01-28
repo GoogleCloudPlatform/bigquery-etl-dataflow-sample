@@ -16,8 +16,16 @@
 
 package com.google.cloud.bqetl;
 
-import com.google.cloud.bqetl.mbdata.MusicBrainzTransforms;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.google.cloud.bqetl.mbdata.MusicBrainzDataObject;
+import com.google.cloud.bqetl.mbdata.MusicBrainzTransforms;
 import com.google.cloud.dataflow.sdk.coders.StringUtf8Coder;
 import com.google.cloud.dataflow.sdk.runners.DirectPipeline;
 import com.google.cloud.dataflow.sdk.runners.DirectPipelineRunner;
@@ -30,15 +38,7 @@ import com.google.cloud.dataflow.sdk.values.PCollection;
 import com.google.cloud.dataflow.sdk.values.PCollectionView;
 import com.google.cloud.dataflow.sdk.values.TypeDescriptor;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.*;
 
 /**
  * Created by johnlabarge on 9/30/16.
@@ -110,8 +110,11 @@ public class MusicBrainzTransformsTest {
 
     DirectPipeline p = DirectPipeline.createForTest();
 
+    // Artist - An artist is generally a musician, a group of musicians, or another music professional (composer, engineer, illustrator, producer, etc.)
     PCollection<String> artistText = p.apply("artist", Create.of(artistLinesOfJson)).setCoder(StringUtf8Coder.of());
     Map<String, PCollectionView<Map<Long, String>>> maps = new HashMap<>();
+    // Area - A country, region, city or the like.
+    // Areas that can be used for filling in the Release country field of releases are listed, by ID, in the country_area table.
     PCollection<String> areaMapText = p.apply("area", Create.of(areaLinesOfJson)).setCoder(StringUtf8Coder.of());
     PCollectionView<Map<Long, String>> areamap = MusicBrainzTransforms.loadMapFromText(areaMapText, "id", "area");
     maps.put("area", areamap);

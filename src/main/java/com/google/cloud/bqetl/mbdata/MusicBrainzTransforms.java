@@ -16,6 +16,16 @@
 
 package com.google.cloud.bqetl.mbdata;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.api.services.bigquery.model.TableFieldSchema;
 import com.google.api.services.bigquery.model.TableRow;
 import com.google.api.services.bigquery.model.TableSchema;
@@ -24,15 +34,19 @@ import com.google.cloud.bqetl.mbschema.FieldSchemaListBuilder;
 import com.google.cloud.bqetl.options.BQETLOptions;
 import com.google.cloud.dataflow.sdk.Pipeline;
 import com.google.cloud.dataflow.sdk.io.TextIO;
-import com.google.cloud.dataflow.sdk.transforms.*;
+import com.google.cloud.dataflow.sdk.transforms.DoFn;
+import com.google.cloud.dataflow.sdk.transforms.Flatten;
+import com.google.cloud.dataflow.sdk.transforms.MapElements;
+import com.google.cloud.dataflow.sdk.transforms.ParDo;
+import com.google.cloud.dataflow.sdk.transforms.View;
 import com.google.cloud.dataflow.sdk.transforms.join.CoGbkResult;
 import com.google.cloud.dataflow.sdk.transforms.join.CoGroupByKey;
 import com.google.cloud.dataflow.sdk.transforms.join.KeyedPCollectionTuple;
-import com.google.cloud.dataflow.sdk.values.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.*;
+import com.google.cloud.dataflow.sdk.values.KV;
+import com.google.cloud.dataflow.sdk.values.PCollection;
+import com.google.cloud.dataflow.sdk.values.PCollectionView;
+import com.google.cloud.dataflow.sdk.values.TupleTag;
+import com.google.cloud.dataflow.sdk.values.TypeDescriptor;
 
 
 public class MusicBrainzTransforms {
@@ -364,14 +378,20 @@ public class MusicBrainzTransforms {
    */
   // [START lookupTableWithSideInputs1]
   public static PCollectionView<Map<Long, String>> loadMapFromText(PCollection<String> text, String keyKey, String valueKey) {
-    String keyKeyName = "_" + keyKey;
-    String valueKeyName = "_" + valueKey;
-
+    final String keyKeyName = "_" + keyKey;
+    final String valueKeyName = "_" + valueKey;
     PCollection<KV<Long, String>> entries = text.apply(MapElements.via((String input) -> {
       MusicBrainzDataObject object = JSONReader.readObject("", input);
-      Long key = (Long) object.getColumnValue(keyKeyName);
-      String value = (String) object.getColumnValue(valueKeyName);
-      return KV.of((Long) object.getColumnValue(keyKeyName), (String) object.getColumnValue(valueKeyName));
+//      logger.info(String.format("keyKeyName = %s", keyKeyName), keyKeyName);
+//      logger.info(String.format("valueKeyName = %s", valueKeyName), valueKeyName);
+      // at some point keyKey changes from id to gender and valueKey changes from name to id
+      // switch the local variables to prevent the PCollection load from failing due to the following error
+      // java.lang.ClassCastException: java.lang.Long cannot be cast to java.lang.String
+//          if(keyKey.equals("id")) {
+            return KV.of((Long) object.getColumnValue(keyKeyName), (String) object.getColumnValue(valueKeyName));
+//          } else {
+//            return KV.of((Long) object.getColumnValue(valueKeyName), (String) object.getColumnValue(keyKeyName));
+//          }
     }).withOutputType(new TypeDescriptor<KV<Long, String>>() {
     }));
 
@@ -405,7 +425,7 @@ public class MusicBrainzTransforms {
     return loadTableFromText(text, name, keyName, mapSideInputs);
   }
 
-  private static PCollection<KV<Long, MusicBrainzDataObject>> loadTableFromText(PCollection<String> text, String name,
+  public static PCollection<KV<Long, MusicBrainzDataObject>> loadTableFromText(PCollection<String> text, String name,
                                                                                String keyName,
                                                                                Map<String, PCollectionView<Map<Long, String>>> mappings) {
     final String namespacedKeyname = name + "_" + keyName;

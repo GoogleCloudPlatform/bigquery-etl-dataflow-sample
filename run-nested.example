@@ -8,6 +8,6 @@ mvn compile exec:java \
     --numWorkers=20 \
     --maxNumWorkers=70 \
     --bigQueryTablename=#PROJECT_NAME:#DATASET.#DESTINATION_TABLE \
-    --diskSizeGb=1000 \
+    --diskSizeGb=100 \
     --workerMachineType=n1-standard-1"
 

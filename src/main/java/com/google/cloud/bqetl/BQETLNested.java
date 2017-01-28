@@ -16,6 +16,9 @@
 
 package com.google.cloud.bqetl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.api.services.bigquery.model.TableRow;
 import com.google.api.services.bigquery.model.TableSchema;
 import com.google.cloud.bqetl.mbdata.MusicBrainzDataObject;
@@ -27,10 +30,6 @@ import com.google.cloud.dataflow.sdk.io.BigQueryIO;
 import com.google.cloud.dataflow.sdk.options.PipelineOptionsFactory;
 import com.google.cloud.dataflow.sdk.values.KV;
 import com.google.cloud.dataflow.sdk.values.PCollection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import static com.google.cloud.bqetl.mbdata.MusicBrainzTransforms.loadTable;
 
 public class BQETLNested {
   private static final Logger logger = LoggerFactory.getLogger(BQETLNested.class);
@@ -38,39 +37,26 @@ public class BQETLNested {
   public static void main(String[] args) {
     PipelineOptionsFactory.register(BQETLOptions.class);
 
-        /*
-         * get the custom options
-         */
+    // get the custom options
     BQETLOptions BQETLOptions = PipelineOptionsFactory.fromArgs(args).withValidation().as(BQETLOptions.class);
     Pipeline p = Pipeline.create(BQETLOptions);
 
-
-        /*
-         * load the line delimited JSON into keyed PCollections
-         */
-
+    // load the line delimited JSON into keyed PCollections
     PCollection<KV<Long, MusicBrainzDataObject>> artists = MusicBrainzTransforms.loadTable(p, "artist", "id",
-        MusicBrainzTransforms.lookup("area", "id", "name", "area", "begin_area"),
-        MusicBrainzTransforms.lookup("gender", "gender", "id", "name"));
+        MusicBrainzTransforms.lookup("area", "id", "name", "area"),  // removed begin_area from list of destinationKeys to replace
+        MusicBrainzTransforms.lookup("gender", "id", "name", "gender"));  // moved second gender to the end as a destinationKey to replace
     PCollection<KV<Long, MusicBrainzDataObject>> artistCreditName = MusicBrainzTransforms.loadTable(p, "artist_credit_name", "artist_credit");
     PCollection<KV<Long, MusicBrainzDataObject>> recordingsByArtistCredit = MusicBrainzTransforms.loadTable(p, "recording", "artist_credit");
 
-    PCollection<MusicBrainzDataObject> recordingCredits = MusicBrainzTransforms.innerJoin("nested recordings", artistCreditName, recordingsByArtistCredit);
-
+    // changed innerJoin result name from nested recordings to recordings
+    PCollection<MusicBrainzDataObject> recordingCredits = MusicBrainzTransforms.innerJoin("recordings", artistCreditName, recordingsByArtistCredit);
     PCollection<MusicBrainzDataObject> artistsWithRecordings = MusicBrainzTransforms.nest(artists, MusicBrainzTransforms.by("artist_credit_name_artist", recordingCredits), "recordings");
 
-
-        /*
-         * create the table schema for Big Query
-         */
+    // create the table schema for Big Query
     TableSchema bqTableSchema = bqSchema();
-        /*
-         *  transform the joined MusicBrainzDataObject results into BQ Table rows
-         */
+    // transform the joined MusicBrainzDataObject results into BQ Table rows
     PCollection<TableRow> tableRows = MusicBrainzTransforms.transformToTableRows(artistsWithRecordings, bqTableSchema);
-        /*
-         * write the tablerows to Big Query
-         */
+    // write the tablerows to Big Query
     try {
       tableRows.apply(BigQueryIO.Write
           .named("Write")
@@ -83,7 +69,6 @@ public class BQETLNested {
     }
     p.run();
   }
-
 
   private static TableSchema bqSchema() {
     return FieldSchemaListBuilder.create()
@@ -98,8 +83,12 @@ public class BQETLNested {
         .intField("artist_end_date_month")
         .intField("artist_end_date_day")
         .intField("artist_type")
+        /*Switch these two lines when using mapping table for artist_area */
         .stringField("artist_area")
+        //.intField("artist_area")
+        /*Switch these two lines when using mapping table for artist_gender */
         .stringField("artist_gender")
+        //.intField("artist_gender")
         .intField("artist_edits_pending")
         .timestampField("artist_last_updated")
         .stringField("artist_comment")
@@ -114,12 +103,12 @@ public class BQETLNested {
             .intField("recording_id")
             .stringField("recording_gid")
             .stringField("recording_name")
+            .intField("recording_artist_credit")
             .intField("recording_length")
             .stringField("recording_comment")
             .intField("recording_edits_pending")
             .timestampField("recording_last_updated")
             .boolField("recording_video")
             .repeatedRecord("artist_recordings")).schema();
-
   }
 }
