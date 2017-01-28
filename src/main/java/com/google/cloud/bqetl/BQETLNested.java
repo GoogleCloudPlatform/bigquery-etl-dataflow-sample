@@ -43,16 +43,13 @@ public class BQETLNested {
 
     // load the line delimited JSON into keyed PCollections
     PCollection<KV<Long, MusicBrainzDataObject>> artists = MusicBrainzTransforms.loadTable(p, "artist", "id",
-        MusicBrainzTransforms.lookup("area", "id", "name", "area"),
-        //MusicBrainzTransforms.lookup("area", "id", "name", "area", "begin_area"),
-        MusicBrainzTransforms.lookup("gender", "id", "name", "gender"));
-        //MusicBrainzTransforms.lookup("gender", "gender", "id", "name"));
+        MusicBrainzTransforms.lookup("area", "id", "name", "area"),  // removed begin_area from list of destinationKeys to replace
+        MusicBrainzTransforms.lookup("gender", "id", "name", "gender"));  // moved second gender to the end as a destinationKey to replace
     PCollection<KV<Long, MusicBrainzDataObject>> artistCreditName = MusicBrainzTransforms.loadTable(p, "artist_credit_name", "artist_credit");
     PCollection<KV<Long, MusicBrainzDataObject>> recordingsByArtistCredit = MusicBrainzTransforms.loadTable(p, "recording", "artist_credit");
 
-    // changing innerJoin result name from nested recordings to recordings
+    // changed innerJoin result name from nested recordings to recordings
     PCollection<MusicBrainzDataObject> recordingCredits = MusicBrainzTransforms.innerJoin("recordings", artistCreditName, recordingsByArtistCredit);
-    //PCollection<MusicBrainzDataObject> recordingCredits = MusicBrainzTransforms.innerJoin("nested recordings", artistCreditName, recordingsByArtistCredit);
     PCollection<MusicBrainzDataObject> artistsWithRecordings = MusicBrainzTransforms.nest(artists, MusicBrainzTransforms.by("artist_credit_name_artist", recordingCredits), "recordings");
 
     // create the table schema for Big Query
@@ -73,42 +70,6 @@ public class BQETLNested {
     p.run();
   }
 
-//  return FieldSchemaListBuilder.create()
-//      .intField("artist_id")
-//  .stringField("artist_gid")
-//  .stringField("artist_name")
-//  .stringField("artist_sort_name")
-//  .intField("artist_begin_date_year")
-//  .intField("artist_begin_date_month")
-//  .intField("artist_begin_date_day")
-//  .intField("artist_end_date_year")
-//  .intField("artist_end_date_month")
-//  .intField("artist_end_date_day")
-//  .boolField("artist_ended")
-//  .intField("artist_type")
-//  .stringField("artist_gender")
-//  .stringField("artist_area")
-//  .intField("artist_begin_area")
-//  .intField("artist_end_area")
-//  .stringField("artist_comment")
-//  .intField("artist_edits_pending")
-//  .timestampField("artist_last_updated")
-//  .field(FieldSchemaListBuilder.create()
-//  .intField("artist_credit_name_artist_credit")
-//  .intField("artist_credit_name_position")
-//  .intField("artist_credit_name_artist")
-//  .stringField("artist_credit_name_name")
-//  .stringField("artist_credit_name_join_phrase")
-//  .intField("recording_id")
-//  .stringField("recording_gid")
-//  .stringField("recording_name")
-//  .intField("recording_length")
-//  .stringField("recording_comment")
-//  .intField("recording_edits_pending")
-//  .timestampField("recording_last_updated")
-//  //.boolField("recording_video")
-//  .repeatedRecord("artist_recordings")).schema();
-
   private static TableSchema bqSchema() {
     return FieldSchemaListBuilder.create()
         .intField("artist_id")
@@ -122,25 +83,17 @@ public class BQETLNested {
         .intField("artist_end_date_month")
         .intField("artist_end_date_day")
         .intField("artist_type")
-        // [START schemaCodeChange]
-/*Switch these two lines when using mapping table for artist_area */
+        /*Switch these two lines when using mapping table for artist_area */
         .stringField("artist_area")
-//        .intField("artist_area")
-        // [END schemaCodeChange]
-        // [START schemaCodeChange2]
-/*Switch these two lines when using mapping table for artist_gender */
+        //.intField("artist_area")
+        /*Switch these two lines when using mapping table for artist_gender */
         .stringField("artist_gender")
-//        .intField("artist_gender")
-        //[END schemaCodeChange2]
+        //.intField("artist_gender")
         .intField("artist_edits_pending")
         .timestampField("artist_last_updated")
         .stringField("artist_comment")
         .boolField("artist_ended")
-/*Switch these two lines when using mapping table for artist_begin_area */
-        // [START schemaCodeChange3]
         .intField("artist_begin_area")
-        //      .stringField("artist_begin_area")
-        // [END schemaCodeChange3]
         .field(FieldSchemaListBuilder.create()
             .intField("artist_credit_name_artist_credit")
             .intField("artist_credit_name_position")
