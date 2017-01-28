@@ -487,10 +487,10 @@ public class MusicBrainzTransforms {
    * Note that in this demonstration maps are assumed to be of the form Long -> String.
    *
    * @param objectName      - the storage object name
-   * @param destinationKeys - the key to replace in the target object
    * @param keyKey          - the keyname in the mapping table that will match the value in the target object to be
    *                        replaced (e.g. id)
    * @param valueKey        - the keyname in the mapping table that contains the value
+   * @param destinationKeys - the key to replace in the target object
    */
   // [START lookupMethod]
   public static LookupDescription lookup(String objectName, String keyKey, String valueKey, String... destinationKeys) {

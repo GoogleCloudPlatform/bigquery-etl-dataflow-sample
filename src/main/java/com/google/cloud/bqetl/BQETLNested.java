@@ -51,7 +51,7 @@ public class BQETLNested {
 
     PCollection<KV<Long, MusicBrainzDataObject>> artists = MusicBrainzTransforms.loadTable(p, "artist", "id",
         MusicBrainzTransforms.lookup("area", "id", "name", "area", "begin_area"),
-        MusicBrainzTransforms.lookup("gender", "gender", "id", "name"));
+        MusicBrainzTransforms.lookup("gender", "id", "name", "gender"));
     PCollection<KV<Long, MusicBrainzDataObject>> artistCreditName = MusicBrainzTransforms.loadTable(p, "artist_credit_name", "artist_credit");
     PCollection<KV<Long, MusicBrainzDataObject>> recordingsByArtistCredit = MusicBrainzTransforms.loadTable(p, "recording", "artist_credit");
 
@@ -104,7 +104,7 @@ public class BQETLNested {
         .timestampField("artist_last_updated")
         .stringField("artist_comment")
         .boolField("artist_ended")
-        .intField("artist_begin_area")
+        .stringField("artist_begin_area")
         .field(FieldSchemaListBuilder.create()
             .intField("artist_credit_name_artist_credit")
             .intField("artist_credit_name_position")
