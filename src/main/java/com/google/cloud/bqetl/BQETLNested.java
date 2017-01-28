@@ -16,6 +16,9 @@
 
 package com.google.cloud.bqetl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.api.services.bigquery.model.TableRow;
 import com.google.api.services.bigquery.model.TableSchema;
 import com.google.cloud.bqetl.mbdata.MusicBrainzDataObject;
@@ -27,10 +30,6 @@ import com.google.cloud.dataflow.sdk.io.BigQueryIO;
 import com.google.cloud.dataflow.sdk.options.PipelineOptionsFactory;
 import com.google.cloud.dataflow.sdk.values.KV;
 import com.google.cloud.dataflow.sdk.values.PCollection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import static com.google.cloud.bqetl.mbdata.MusicBrainzTransforms.loadTable;
 
 public class BQETLNested {
   private static final Logger logger = LoggerFactory.getLogger(BQETLNested.class);
@@ -51,7 +50,8 @@ public class BQETLNested {
 
     PCollection<KV<Long, MusicBrainzDataObject>> artists = MusicBrainzTransforms.loadTable(p, "artist", "id",
         MusicBrainzTransforms.lookup("area", "id", "name", "area", "begin_area"),
-        MusicBrainzTransforms.lookup("gender", "gender", "id", "name"));
+        MusicBrainzTransforms.lookup("gender", "id", "name"));
+        //MusicBrainzTransforms.lookup("gender", "gender", "id", "name"));
     PCollection<KV<Long, MusicBrainzDataObject>> artistCreditName = MusicBrainzTransforms.loadTable(p, "artist_credit_name", "artist_credit");
     PCollection<KV<Long, MusicBrainzDataObject>> recordingsByArtistCredit = MusicBrainzTransforms.loadTable(p, "recording", "artist_credit");
 

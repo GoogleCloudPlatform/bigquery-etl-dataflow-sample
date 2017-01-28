@@ -378,18 +378,20 @@ public class MusicBrainzTransforms {
    */
   // [START lookupTableWithSideInputs1]
   public static PCollectionView<Map<Long, String>> loadMapFromText(PCollection<String> text, String keyKey, String valueKey) {
-    String keyKeyName = "_" + keyKey;
-    String valueKeyName = "_" + valueKey;
-
+    final String keyKeyName = "_" + keyKey;
+    final String valueKeyName = "_" + valueKey;
     PCollection<KV<Long, String>> entries = text.apply(MapElements.via((String input) -> {
       MusicBrainzDataObject object = JSONReader.readObject("", input);
       logger.info(String.format("keyKeyName = %s", keyKeyName), keyKeyName);
       logger.info(String.format("valueKeyName = %s", valueKeyName), valueKeyName);
-      logger.info(String.format("(Long) object.getColumnValue(keyKeyName) = %d", (Long) object.getColumnValue(keyKeyName)), 1);
-      logger.info(String.format("(String) object.getColumnValue(valueKeyName) = %s", (String) object.getColumnValue(valueKeyName)), 2);
-//      Long key = (Long) object.getColumnValue(keyKeyName);
-//      String value = (String) object.getColumnValue(valueKeyName);
-      return KV.of((Long) object.getColumnValue(keyKeyName), (String) object.getColumnValue(valueKeyName));
+      // at some point keyKey changes from id to gender and valueKey changes from name to id
+      // switch the local variables to prevent the PCollection load from failing due to the following error
+      // java.lang.ClassCastException: java.lang.Long cannot be cast to java.lang.String
+          if(keyKey.equals("id")) {
+            return KV.of((Long) object.getColumnValue(keyKeyName), (String) object.getColumnValue(valueKeyName));
+          } else {
+            return KV.of((Long) object.getColumnValue(valueKeyName), (String) object.getColumnValue(keyKeyName));
+          }
     }).withOutputType(new TypeDescriptor<KV<Long, String>>() {
     }));
 
@@ -414,9 +416,6 @@ public class MusicBrainzTransforms {
     //[START lookupTableWithSideInputs2]
     Map<String, PCollectionView<Map<Long, String>>> mapSideInputs = new HashMap<String, PCollectionView<Map<Long, String>>>();
     for (LookupDescription mapper : mappers) {
-      logger.info(String.format("loadTableFromText mapper.objectName = %s", mapper.objectName));
-      logger.info(String.format("loadTableFromText mapper.keyKey = %s", mapper.keyKey));
-      logger.info(String.format("loadTableFromText mapper.valueKey = %s", mapper.valueKey));
       PCollectionView<Map<Long, String>> mapView = loadMap(text.getPipeline(), mapper.objectName, mapper.keyKey, mapper.valueKey);
       mapper.destinationKeys.forEach((destinationKey) -> {
         mapSideInputs.put(name + "_" + destinationKey, mapView);
@@ -468,9 +467,6 @@ public class MusicBrainzTransforms {
    * @param valueKey - the name of hte json key to use as the value in the resulting map.
    */
   private static PCollectionView<Map<Long, String>> loadMap(Pipeline p, String name, String keyKey, String valueKey) {
-    logger.info(String.format("loadMap name = %s", name));
-    logger.info(String.format("loadMap keyKey = %s", keyKey));
-    logger.info(String.format("loadMap valueKey = %s", valueKey));
     PCollection<String> text = loadText(p, name);
     return loadMapFromText(text, keyKey, valueKey);
   }
