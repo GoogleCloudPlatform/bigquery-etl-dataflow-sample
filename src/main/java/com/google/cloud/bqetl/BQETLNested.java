@@ -37,20 +37,14 @@ public class BQETLNested {
   public static void main(String[] args) {
     PipelineOptionsFactory.register(BQETLOptions.class);
 
-        /*
-         * get the custom options
-         */
+    // get the custom options
     BQETLOptions BQETLOptions = PipelineOptionsFactory.fromArgs(args).withValidation().as(BQETLOptions.class);
     Pipeline p = Pipeline.create(BQETLOptions);
 
-
-        /*
-         * load the line delimited JSON into keyed PCollections
-         */
-
+    // load the line delimited JSON into keyed PCollections
     PCollection<KV<Long, MusicBrainzDataObject>> artists = MusicBrainzTransforms.loadTable(p, "artist", "id",
         MusicBrainzTransforms.lookup("area", "id", "name", "area", "begin_area"),
-        MusicBrainzTransforms.lookup("gender", "id", "name"));
+        MusicBrainzTransforms.lookup("gender", "id", "name", "gender"));
         //MusicBrainzTransforms.lookup("gender", "gender", "id", "name"));
     PCollection<KV<Long, MusicBrainzDataObject>> artistCreditName = MusicBrainzTransforms.loadTable(p, "artist_credit_name", "artist_credit");
     PCollection<KV<Long, MusicBrainzDataObject>> recordingsByArtistCredit = MusicBrainzTransforms.loadTable(p, "recording", "artist_credit");
@@ -58,23 +52,13 @@ public class BQETLNested {
     // changing innerJoin result name from nested recordings to recordings
     PCollection<MusicBrainzDataObject> recordingCredits = MusicBrainzTransforms.innerJoin("recordings", artistCreditName, recordingsByArtistCredit);
     //PCollection<MusicBrainzDataObject> recordingCredits = MusicBrainzTransforms.innerJoin("nested recordings", artistCreditName, recordingsByArtistCredit);
-
-    // fixing incorrect column name changing artist_credit_name_artist to artist_credit_name
-    //PCollection<MusicBrainzDataObject> artistsWithRecordings = MusicBrainzTransforms.nest(artists, MusicBrainzTransforms.by("artist_credit_name_artist", recordingCredits), "recordings");
     PCollection<MusicBrainzDataObject> artistsWithRecordings = MusicBrainzTransforms.nest(artists, MusicBrainzTransforms.by("artist_credit_name_artist", recordingCredits), "recordings");
 
-
-        /*
-         * create the table schema for Big Query
-         */
+    // create the table schema for Big Query
     TableSchema bqTableSchema = bqSchema();
-        /*
-         *  transform the joined MusicBrainzDataObject results into BQ Table rows
-         */
+    // transform the joined MusicBrainzDataObject results into BQ Table rows
     PCollection<TableRow> tableRows = MusicBrainzTransforms.transformToTableRows(artistsWithRecordings, bqTableSchema);
-        /*
-         * write the tablerows to Big Query
-         */
+    // write the tablerows to Big Query
     try {
       tableRows.apply(BigQueryIO.Write
           .named("Write")
@@ -88,7 +72,6 @@ public class BQETLNested {
     p.run();
   }
 
-
   private static TableSchema bqSchema() {
     return FieldSchemaListBuilder.create()
         .intField("artist_id")
@@ -101,14 +84,15 @@ public class BQETLNested {
         .intField("artist_end_date_year")
         .intField("artist_end_date_month")
         .intField("artist_end_date_day")
+        .boolField("artist_ended")
         .intField("artist_type")
-        .stringField("artist_area")
         .stringField("artist_gender")
+        .stringField("artist_area")
+        .intField("artist_begin_area")
+        .intField("artist_end_area")
+        .stringField("artist_comment")
         .intField("artist_edits_pending")
         .timestampField("artist_last_updated")
-        .stringField("artist_comment")
-        .boolField("artist_ended")
-        .intField("artist_begin_area")
         .field(FieldSchemaListBuilder.create()
             .intField("artist_credit_name_artist_credit")
             .intField("artist_credit_name_position")
@@ -122,8 +106,7 @@ public class BQETLNested {
             .stringField("recording_comment")
             .intField("recording_edits_pending")
             .timestampField("recording_last_updated")
-            .boolField("recording_video")
+            //.boolField("recording_video")
             .repeatedRecord("artist_recordings")).schema();
-
   }
 }
