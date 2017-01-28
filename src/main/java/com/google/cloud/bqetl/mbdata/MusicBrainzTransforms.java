@@ -414,6 +414,9 @@ public class MusicBrainzTransforms {
     //[START lookupTableWithSideInputs2]
     Map<String, PCollectionView<Map<Long, String>>> mapSideInputs = new HashMap<String, PCollectionView<Map<Long, String>>>();
     for (LookupDescription mapper : mappers) {
+      logger.info(String.format("loadTableFromText mapper.objectName = %s", mapper.objectName));
+      logger.info(String.format("loadTableFromText mapper.keyKey = %s", mapper.keyKey));
+      logger.info(String.format("loadTableFromText mapper.valueKey = %s", mapper.valueKey));
       PCollectionView<Map<Long, String>> mapView = loadMap(text.getPipeline(), mapper.objectName, mapper.keyKey, mapper.valueKey);
       mapper.destinationKeys.forEach((destinationKey) -> {
         mapSideInputs.put(name + "_" + destinationKey, mapView);
@@ -465,6 +468,9 @@ public class MusicBrainzTransforms {
    * @param valueKey - the name of hte json key to use as the value in the resulting map.
    */
   private static PCollectionView<Map<Long, String>> loadMap(Pipeline p, String name, String keyKey, String valueKey) {
+    logger.info(String.format("loadMap name = %s", name));
+    logger.info(String.format("loadMap keyKey = %s", keyKey));
+    logger.info(String.format("loadMap valueKey = %s", valueKey));
     PCollection<String> text = loadText(p, name);
     return loadMapFromText(text, keyKey, valueKey);
   }
