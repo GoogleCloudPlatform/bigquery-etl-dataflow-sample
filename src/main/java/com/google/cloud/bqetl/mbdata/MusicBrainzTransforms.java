@@ -382,16 +382,16 @@ public class MusicBrainzTransforms {
     final String valueKeyName = "_" + valueKey;
     PCollection<KV<Long, String>> entries = text.apply(MapElements.via((String input) -> {
       MusicBrainzDataObject object = JSONReader.readObject("", input);
-      logger.info(String.format("keyKeyName = %s", keyKeyName), keyKeyName);
-      logger.info(String.format("valueKeyName = %s", valueKeyName), valueKeyName);
+//      logger.info(String.format("keyKeyName = %s", keyKeyName), keyKeyName);
+//      logger.info(String.format("valueKeyName = %s", valueKeyName), valueKeyName);
       // at some point keyKey changes from id to gender and valueKey changes from name to id
       // switch the local variables to prevent the PCollection load from failing due to the following error
       // java.lang.ClassCastException: java.lang.Long cannot be cast to java.lang.String
-          if(keyKey.equals("id")) {
+//          if(keyKey.equals("id")) {
             return KV.of((Long) object.getColumnValue(keyKeyName), (String) object.getColumnValue(valueKeyName));
-          } else {
-            return KV.of((Long) object.getColumnValue(valueKeyName), (String) object.getColumnValue(keyKeyName));
-          }
+//          } else {
+//            return KV.of((Long) object.getColumnValue(valueKeyName), (String) object.getColumnValue(keyKeyName));
+//          }
     }).withOutputType(new TypeDescriptor<KV<Long, String>>() {
     }));
 

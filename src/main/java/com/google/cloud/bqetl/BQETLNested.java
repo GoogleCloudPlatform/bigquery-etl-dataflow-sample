@@ -55,9 +55,13 @@ public class BQETLNested {
     PCollection<KV<Long, MusicBrainzDataObject>> artistCreditName = MusicBrainzTransforms.loadTable(p, "artist_credit_name", "artist_credit");
     PCollection<KV<Long, MusicBrainzDataObject>> recordingsByArtistCredit = MusicBrainzTransforms.loadTable(p, "recording", "artist_credit");
 
-    PCollection<MusicBrainzDataObject> recordingCredits = MusicBrainzTransforms.innerJoin("nested recordings", artistCreditName, recordingsByArtistCredit);
+    // changing innerJoin result name from nested recordings to recordings
+    PCollection<MusicBrainzDataObject> recordingCredits = MusicBrainzTransforms.innerJoin("recordings", artistCreditName, recordingsByArtistCredit);
+    //PCollection<MusicBrainzDataObject> recordingCredits = MusicBrainzTransforms.innerJoin("nested recordings", artistCreditName, recordingsByArtistCredit);
 
-    PCollection<MusicBrainzDataObject> artistsWithRecordings = MusicBrainzTransforms.nest(artists, MusicBrainzTransforms.by("artist_credit_name_artist", recordingCredits), "recordings");
+    // fixing incorrect column name changing artist_credit_name_artist to artist_credit_name
+    //PCollection<MusicBrainzDataObject> artistsWithRecordings = MusicBrainzTransforms.nest(artists, MusicBrainzTransforms.by("artist_credit_name_artist", recordingCredits), "recordings");
+    PCollection<MusicBrainzDataObject> artistsWithRecordings = MusicBrainzTransforms.nest(artists, MusicBrainzTransforms.by("artist_credit_name", recordingCredits), "recordings");
 
 
         /*
