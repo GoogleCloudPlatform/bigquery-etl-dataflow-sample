@@ -61,7 +61,7 @@ public class BQETLNested {
 
     // fixing incorrect column name changing artist_credit_name_artist to artist_credit_name
     //PCollection<MusicBrainzDataObject> artistsWithRecordings = MusicBrainzTransforms.nest(artists, MusicBrainzTransforms.by("artist_credit_name_artist", recordingCredits), "recordings");
-    PCollection<MusicBrainzDataObject> artistsWithRecordings = MusicBrainzTransforms.nest(artists, MusicBrainzTransforms.by("artist_credit_name", recordingCredits), "recordings");
+    PCollection<MusicBrainzDataObject> artistsWithRecordings = MusicBrainzTransforms.nest(artists, MusicBrainzTransforms.by("artist_credit_name_artist", recordingCredits), "recordings");
 
 
         /*
