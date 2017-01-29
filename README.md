@@ -18,7 +18,7 @@ The repository consists of the following Java classes:
 5. com.google.cloud.bqetl.json.JSONReader - class for converting a JSON representation of a MusicBrainz tow into a MusicBrainzDataObject
 6. com.google.cloud.bqetl.options.BQETLOptions - the options for the BQETL pipelines
 7. com.google.cloud.bqetl.JSONReaderTest - test for the JSONReader
-8. com.google.cloud.bqetl.MusicBrainzTransformsTest - tests the transforms library
+8. com.google.cloud.bqetl.mbdata.MusicBrainzTransformsTest - tests the transforms library
 
 The repository consists of the following scripts and resources: 
 

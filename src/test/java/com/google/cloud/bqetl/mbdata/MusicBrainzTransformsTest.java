@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.google.cloud.bqetl;
+package com.google.cloud.bqetl.mbdata;
 
 import com.google.cloud.bqetl.mbdata.MusicBrainzTransforms;
 import com.google.cloud.bqetl.mbdata.MusicBrainzDataObject;

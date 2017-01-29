@@ -405,7 +405,7 @@ public class MusicBrainzTransforms {
     return loadTableFromText(text, name, keyName, mapSideInputs);
   }
 
-  private static PCollection<KV<Long, MusicBrainzDataObject>> loadTableFromText(PCollection<String> text, String name,
+  static PCollection<KV<Long, MusicBrainzDataObject>> loadTableFromText(PCollection<String> text, String name,
                                                                                String keyName,
                                                                                Map<String, PCollectionView<Map<Long, String>>> mappings) {
     final String namespacedKeyname = name + "_" + keyName;
