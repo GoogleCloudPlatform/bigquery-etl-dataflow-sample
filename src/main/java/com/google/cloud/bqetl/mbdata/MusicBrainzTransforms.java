@@ -371,7 +371,7 @@ public class MusicBrainzTransforms {
       MusicBrainzDataObject object = JSONReader.readObject("", input);
       Long key = (Long) object.getColumnValue(keyKeyName);
       String value = (String) object.getColumnValue(valueKeyName);
-      return KV.of((Long) object.getColumnValue(keyKeyName), (String) object.getColumnValue(valueKeyName));
+      return KV.of(key, value);
     }).withOutputType(new TypeDescriptor<KV<Long, String>>() {
     }));
 
