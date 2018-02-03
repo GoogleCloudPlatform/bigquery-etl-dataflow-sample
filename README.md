@@ -15,7 +15,7 @@ The repository consists of the following Java classes:
 2. com.google.cloud.bqetl.BQETLNested - Revision of the simple pipeline that nests the artist's recordings as a repeated record inside each Big Query table row which pertains to an artist.
 3. com.google.cloud.bqetl.mbdata.MusicBrainzDataObject - a general purpose object to represent a row of MusicBrainz data
 4. com.google.cloud.bqetl.mbdata.MusicBrainzTransforms - the library of functions that implements the transforms used in the above pipelines and allows them to be reused
-5. com.google.cloud.bqetl.json.JSONReader - class for converting a JSON representation of a MusicBrainz tow into a MusicBrainzDataObject
+5. com.google.cloud.bqetl.json.JSONReader - class for converting a JSON representation of a MusicBrainz row into a MusicBrainzDataObject
 6. com.google.cloud.bqetl.options.BQETLOptions - the options for the BQETL pipelines
 7. com.google.cloud.bqetl.JSONReaderTest - test for the JSONReader
 8. com.google.cloud.bqetl.mbdata.MusicBrainzTransformsTest - tests the transforms library
