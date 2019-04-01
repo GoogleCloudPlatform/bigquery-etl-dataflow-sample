@@ -1,10 +1,14 @@
 # Performing ETL into Big Query Tutorial Sample Code
 
-This is the sample code for the Big Query Ingestion to Insights Tutorial.  The tutorial explains how to ingest highly normalized (OLTP database style) data into Big Query using DataFlow. To understand this sample code it is recommended that you review the [Google Cloud Dataflow programming model]. (https://cloud.google.com/dataflow/). 
+This is the sample code for the Performing ETL from a Relational Database into BigQuery using Dataflow.  The tutorial explains how to ingest highly normalized (OLTP database style) data into Big Query using DataFlow. To understand this sample code it is recommended that you review the [Apache Beam programming model](https://beam.apache.org/documentation/programming-guide/). 
 
 This tutorial relies on the [musicbrainz dataset](https://musicbrainz.org/doc/MusicBrainz_Database). 
 
-Note that this tutorial assumes that you have Java 8 and maven and [Google Cloud SDK](https://cloud.google.com/sdk/docs/) installed.  It also requires that you have a project, dataflow staging bucket and big query dataset already created. 
+Note that this tutorial assumes that either:
+* you are using Cloud Shell
+* you have Java 8, maven and [Google Cloud SDK](https://cloud.google.com/sdk/docs/) installed.  
+
+It also requires that you have a project, dataflow staging bucket and big query dataset already created. 
 
 
 ## Overview
@@ -23,24 +27,47 @@ The repository consists of the following Java classes:
 The repository consists of the following scripts and resources: 
 
 1. src/test/resources data files for the test classes 
-2. dataflow-staging-policy.json - a policy for expiring objects in the bucket used for staging the dataflow jobs
-3. run-simple.example - example script for running the simple pipeline using maven
-4. run-nested.example - example script for running the nested pipeline using maven
-5. pom.xml - maven build script 
+1. dataflow-staging-policy.json - a policy for expiring objects in the bucket used for staging the dataflow jobs
+1. run.sh - example script for running the pipelines using maven
+1. pom.xml - maven build script 
  
 
-## Getting Started
+## Quickstart: Running the ETL Pipelines
 
-1. copy the files run-simple.example and run-nested.example to run-simple and run-nested respectively.
-'''
-cp run-simple.example run-simple
-cp run-nested.example run-nested 
+NOTE: For more detail instructions, and pipeline details, see the [full tutorial on Google Cloud Solutions](https://cloud.google.com/solutions/performing-etl-from-relational-database-into-bigquery). 
 
-2. Edit each file replacing the  #STAGING_BUCKET_, #PROJECT, #DATASET with the values specific to your account. 
-3. Edit each file replacing #DESTINATION_TABLE with the table you want to load the denormalized data into.  Note that to preserve the table for each run you may want to use different destination tables for each of these scripts. 
-4. Save the changes for each script.
-5. Run either script as desired.
-6. As an alternative to editing the script you can simply copy and paste the command therein to your shell replacing the aforementioned values with those specific to your project.
+1. Follow the instructions to set up your project and service account:
+
+   [Dataflow using Java and Apache Maven: Before you begin](https://cloud.google.com/dataflow/docs/quickstarts/quickstart-java-maven#before-you-begin)
+
+1. Set your environment variables.  
+
+   For example: 
+
+     ```shell
+     export PROJECT_ID=[YOUR_PROJECT_ID]
+     export ZONE=[CHOOSE_AN_APPROPRIATE_ZONE] # e.g. us-east1-c
+     export STAGING_BUCKET=${PROJECT_ID}-etl-staging-bucket
+     export DATASET=musicbrainz
+     
+     ```
+
+1. First, run the `simple` pipeline using the script `run.sh`:
+
+     ```shell
+     export DESTINATION_TABLE=recordings_by_artists_dataflow_nested
+     ./run.sh simple
+     ```
+     
+   when this pipeline finishes, you can review the results in the BigQuery table: `recordings_by_artists_dataflow`
+
+1. Then, run the `nested` pipeline using the script `run.sh`:
+
+     ```shell
+     export DESTINATION_TABLE=recordings_by_artists_dataflow_nested
+     ./run.sh nested
+     ```
+    when this pipeline finishes, you can review the results in the BigQuery table: `recordings_by_artists_dataflow_nested`
 
 ## Contact Us
 
@@ -53,5 +80,5 @@ on GitHub to report any bugs, comments or questions regarding SDK development.
 ## More Information
 
 * [Google Cloud Dataflow](https://cloud.google.com/dataflow/)
-* [Dataflow Concepts and Programming Model](https://cloud.google.com/dataflow/model/programming-model)
+* [Apache Beam programming model](https://beam.apache.org/documentation/programming-guide/).
 * [Java API Reference](https://cloud.google.com/dataflow/java-sdk/JavaDoc/index)
