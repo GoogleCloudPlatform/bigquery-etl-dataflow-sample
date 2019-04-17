@@ -55,7 +55,7 @@ NOTE: For more detail instructions, and pipeline details, see the [full tutorial
 1. First, run the `simple` pipeline using the script `run.sh`:
 
      ```shell
-     export DESTINATION_TABLE=recordings_by_artists_dataflow_nested
+     export DESTINATION_TABLE=recordings_by_artists_dataflow
      ./run.sh simple
      ```
      
