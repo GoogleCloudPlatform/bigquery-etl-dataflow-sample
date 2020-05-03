@@ -72,11 +72,11 @@ public class BQETLSimple {
          * load the line delimited JSON into keyed PCollections
          */
     // [START loadArtistsWithLookups]
-    //PCollection<KV<Long,MusicBrainzDataObject>> artists = MusicBrainzTransforms.loadTable(p,"artist","id",
-    //        MusicBrainzTransforms.lookup("area", "id", "name", "area", "begin_area"),
-    //        MusicBrainzTransforms.lookup("gender","id","name","gender"));
+    PCollection<KV<Long,MusicBrainzDataObject>> artists = MusicBrainzTransforms.loadTable(p,"artist","id",
+            MusicBrainzTransforms.lookup("area", "id", "name", "area", "begin_area"),
+            MusicBrainzTransforms.lookup("gender","id","name","gender"));
 
-    PCollection<KV<Long, MusicBrainzDataObject>> artists = MusicBrainzTransforms.loadTable(p, "artist", "id");
+    //PCollection<KV<Long, MusicBrainzDataObject>> artists = MusicBrainzTransforms.loadTable(p, "artist", "id");
     // [END loadArtistsWithLookups]
     PCollection<KV<Long, MusicBrainzDataObject>> artistCreditName = MusicBrainzTransforms.loadTable(p, "artist_credit_name", "artist");
     PCollection<KV<Long, MusicBrainzDataObject>> recordingsByArtistCredit = MusicBrainzTransforms.loadTable(p, "recording", "artist_credit");
@@ -141,13 +141,13 @@ public class BQETLSimple {
         .intField("artist_type")
 // [START schemaCodeChange]
 /*Switch these two lines when using mapping table for artist_area */
-//        .stringField("artist_area")
-        .intField("artist_area")
+        .stringField("artist_area")
+//        .intField("artist_area")
 // [END schemaCodeChange]
 // [START schemaCodeChange2]
 /*Switch these two lines when using mapping table for artist_gender */
-//        .stringField("artist_gender")
-        .intField("artist_gender")
+        .stringField("artist_gender")
+//        .intField("artist_gender")
 //[END schemaCodeChange2]
         .intField("artist_edits_pending")
         .timestampField("artist_last_updated")
@@ -155,8 +155,8 @@ public class BQETLSimple {
         .boolField("artist_ended")
 // [START schemaCodeChange3]
 /*Switch these two lines when using mapping table for artist_begin_area */
-        .intField("artist_begin_area")
-//      .stringField("artist_begin_area")
+   //     .intField("artist_begin_area")
+      .stringField("artist_begin_area")
 // [END schemaCodeChange3]
         .intField("artist_credit_name_artist_credit")
         .intField("artist_credit_name_position")
