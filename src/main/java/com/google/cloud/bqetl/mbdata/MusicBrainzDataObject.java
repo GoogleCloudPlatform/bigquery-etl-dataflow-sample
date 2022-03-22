@@ -16,6 +16,7 @@
 
 package com.google.cloud.bqetl.mbdata;
 
+import java.util.Objects;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -133,4 +134,31 @@ public class MusicBrainzDataObject implements Serializable {
     return duplicate;
   }
 
+  /**
+   * Deep equals
+   */
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof MusicBrainzDataObject)) {
+      return false;
+    }
+    MusicBrainzDataObject that = (MusicBrainzDataObject) o;
+    return namespace.equals(that.namespace) && columns.equals(that.columns);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(namespace, columns);
+  }
+
+  @Override
+  public String toString() {
+    return "MusicBrainzDataObject{" +
+        "namespace='" + namespace + '\'' +
+        ", columns=" + columns +
+        '}';
+  }
 }

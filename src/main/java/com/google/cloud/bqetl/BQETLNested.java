@@ -82,7 +82,7 @@ public class BQETLNested {
     } catch (Exception e) {
       logger.error("error writing to BQ: ", e);
     }
-    p.run();
+    p.run().waitUntilFinish();
   }
 
 

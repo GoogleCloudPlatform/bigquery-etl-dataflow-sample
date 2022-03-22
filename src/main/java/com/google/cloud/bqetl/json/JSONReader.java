@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 public class JSONReader {
 
   private static final Logger logger = LoggerFactory.getLogger(JSONReader.class);
+  private static final JsonFactory JSON_FACTORY = new JsonFactory();
 
   /**
    * This method attempts to transform the json node into an object with a known type.
@@ -68,9 +69,8 @@ public class JSONReader {
    */
   public static MusicBrainzDataObject readObject(String objectName, String json) {
     MusicBrainzDataObject datum = new MusicBrainzDataObject(objectName);
-    JsonFactory factory = new JsonFactory();
     try {
-      JsonParser parser = factory.createParser(json);
+      JsonParser parser = JSON_FACTORY.createParser(json);
       parser.setCodec(new ObjectMapper());
       while (!parser.isClosed()) {
         JsonToken token = parser.nextToken();
