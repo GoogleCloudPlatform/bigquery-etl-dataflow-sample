@@ -1,12 +1,12 @@
 /*
  * Copyright 2019 Google LLC
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     https://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,17 +36,18 @@ public class JSONReader {
   /**
    * This method attempts to transform the json node into an object with a known type.
    *
-   * @return an Object with the apparent type from JSON (number types are given their wide equivalent (Long for
-   * ints, Double for float)
+   * @return an Object with the apparent type from JSON (number types are given their wide
+   *     equivalent (Long for ints, Double for float)
    */
-  private static Object nodeValueToObject(JsonNode node) { //No child objects or arrays in this flat data just text/number
+  private static Object nodeValueToObject(
+      JsonNode node) { // No child objects or arrays in this flat data just text/number
     switch (node.getNodeType()) {
       case NUMBER:
         if (node.isFloat() || node.isDouble()) {
-          return new Double(node.doubleValue());
+          return node.doubleValue();
         } else {
-          //For simplicity let all integers be Long.
-          return new Long(node.asLong());
+          // For simplicity let all integers be Long.
+          return node.asLong();
         }
       case STRING:
         return node.asText();
@@ -64,8 +65,8 @@ public class JSONReader {
    * Reads an MusicBrainzDataObject from a json string.
    *
    * @param objectName - the namespace for the object
-   * @param json       the json string
-   * @return
+   * @param json the json string
+   * @return the parsed object
    */
   public static MusicBrainzDataObject readObject(String objectName, String json) {
     MusicBrainzDataObject datum = new MusicBrainzDataObject(objectName);
@@ -78,18 +79,19 @@ public class JSONReader {
         if (token != null && token.equals(JsonToken.START_OBJECT)) {
 
           JsonNode jsonTree = parser.readValueAsTree();
-          jsonTree.fields().forEachRemaining(entry -> {
-            if (entry.getValue() != null) {
-              Object value = nodeValueToObject(entry.getValue());
-              if (value == null) {
-                //  NOOP - unknown node type
-              } else {
-                datum.addColumnValue(entry.getKey(), nodeValueToObject(entry.getValue()));
-              }
-            } else {
-              logger.warn("null value for entry : " + entry.getKey());
-            }
-          });
+          jsonTree
+              .fields()
+              .forEachRemaining(
+                  entry -> {
+                    if (entry.getValue() != null) {
+                      Object value = nodeValueToObject(entry.getValue());
+                      if (value != null) {
+                        datum.addColumnValue(entry.getKey(), nodeValueToObject(entry.getValue()));
+                      }
+                    } else {
+                      logger.warn("null value for entry : " + entry.getKey());
+                    }
+                  });
         }
       }
     } catch (Exception e) {
@@ -97,6 +99,4 @@ public class JSONReader {
     }
     return datum;
   }
-
-
 }
