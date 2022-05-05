@@ -52,27 +52,27 @@ public class BQETLSimple {
     /*
      * get the custom options
      */
-    BQETLOptions BQETLOptions =
+    BQETLOptions options =
         PipelineOptionsFactory.fromArgs(args).withValidation().as(BQETLOptions.class);
-    Pipeline p = Pipeline.create(BQETLOptions);
+    Pipeline p = Pipeline.create(options);
 
     /*
-     * load the line delimited JSON into keyed PCollections
+     * load the line delimited JSON files into keyed PCollections
      */
-    // [START loadArtistsWithLookups]
-    // Uncomment this statement, and comment out the following to performing area/gender lookups
-    /*
-    PCollection<KV<Long, MusicBrainzDataObject>> artists =
-        MusicBrainzTransforms.loadTable(
-            p,
-            "artist",
-            "id",
-            MusicBrainzTransforms.lookup("area", "id", "name", "area", "begin_area"),
-            MusicBrainzTransforms.lookup("gender", "id", "name", "gender"));
-    */
-    PCollection<KV<Long, MusicBrainzDataObject>> artists =
-        MusicBrainzTransforms.loadTable(p, "artist", "id");
-    // [END loadArtistsWithLookups]
+    PCollection<KV<Long, MusicBrainzDataObject>> artists;
+    if (options.getPerformLookups()) {
+      // [START loadArtistsWithLookups]
+      artists =
+          MusicBrainzTransforms.loadTable(
+              p,
+              "artist",
+              "id",
+              MusicBrainzTransforms.lookup("area", "id", "name", "area", "begin_area"),
+              MusicBrainzTransforms.lookup("gender", "id", "name", "gender"));
+      // [END loadArtistsWithLookups]
+    } else {
+      artists = MusicBrainzTransforms.loadTable(p, "artist", "id");
+    }
     PCollection<KV<Long, MusicBrainzDataObject>> artistCreditName =
         MusicBrainzTransforms.loadTable(p, "artist_credit_name", "artist");
     PCollection<KV<Long, MusicBrainzDataObject>> recordingsByArtistCredit =
@@ -98,7 +98,7 @@ public class BQETLSimple {
     /*
      * create the table schema for Big Query
      */
-    TableSchema bqTableSchema = bqSchema();
+    TableSchema bqTableSchema = bqSchema(options.getPerformLookups());
     /*
      *  transform the joined MusicBrainzDataObject results into BQ Table rows
      */
@@ -113,9 +113,9 @@ public class BQETLSimple {
     tableRows.apply(
         "Write to BigQuery",
         BigQueryIO.writeTableRows()
-            .to(BQETLOptions.getBigQueryTablename())
+            .to(options.getBigQueryTablename())
             .withSchema(bqTableSchema)
-            .withCustomGcsTempLocation(StaticValueProvider.of(BQETLOptions.getTempLocation()))
+            .withCustomGcsTempLocation(StaticValueProvider.of(options.getTempLocation()))
             .withWriteDisposition(BigQueryIO.Write.WriteDisposition.WRITE_TRUNCATE)
             .withCreateDisposition(BigQueryIO.Write.CreateDisposition.CREATE_IF_NEEDED));
     // [END bigQueryWrite]
@@ -123,7 +123,7 @@ public class BQETLSimple {
     p.run().waitUntilFinish();
   }
 
-  private static TableSchema bqSchema() {
+  private static TableSchema bqSchema(boolean usingAreaGenderLookups) {
     FieldSchemaListBuilder fieldSchemaListBuilder = new FieldSchemaListBuilder();
 
     fieldSchemaListBuilder
@@ -138,26 +138,10 @@ public class BQETLSimple {
         .intField("artist_end_date_month")
         .intField("artist_end_date_day")
         .intField("artist_type")
-        // [START schemaCodeChange]
-        // Uncomment this line, and comment out the following when using lookups for artist_area.
-        // .stringField("artist_area")
-        .intField("artist_area")
-        // [END schemaCodeChange]
-        // [START schemaCodeChange2]
-        // Uncomment this line, and comment out the following when using lookups for artist_gender.
-        // .stringField("artist_gender")
-        .intField("artist_gender")
-        // [END schemaCodeChange2]
         .intField("artist_edits_pending")
         .timestampField("artist_last_updated")
         .stringField("artist_comment")
         .boolField("artist_ended")
-        // [START schemaCodeChange3]
-        // Uncomment this line, and comment out the following when using lookups for
-        // artist_begin_area.
-        .intField("artist_begin_area")
-        // .stringField("artist_begin_area")
-        // [END schemaCodeChange3]
         .intField("artist_credit_name_artist_credit")
         .intField("artist_credit_name_position")
         .intField("artist_credit_name_artist")
@@ -172,6 +156,18 @@ public class BQETLSimple {
         .intField("recording_edits_pending")
         .timestampField("recording_last_updated")
         .boolField("recording_video");
+
+    if (usingAreaGenderLookups) {
+      fieldSchemaListBuilder
+          .stringField("artist_area")
+          .stringField("artist_gender")
+          .stringField("artist_begin_area");
+    } else {
+      fieldSchemaListBuilder
+          .intField("artist_area")
+          .intField("artist_gender")
+          .intField("artist_begin_area");
+    }
 
     return fieldSchemaListBuilder.schema();
   }

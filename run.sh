@@ -14,28 +14,41 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+case "$1" in
+"nested")
+  CLASS_NAME=BQETLNested
+  USE_LOOKUPS=""
+  ;;
+"simple")
+  CLASS_NAME=BQETLSimple
+  USE_LOOKUPS=""
+  ;;
+"simple-with-lookups")
+  CLASS_NAME=BQETLSimple
+  USE_LOOKUPS="--performLookups"
+  ;;
+*)
+  echo "Pipeline type not specified (simple|simple-with-lookups|nested)"
+  exit
+  ;;
+esac
 
-if [ _$1 == _nested ]
-then
-    CLASS_NAME=BQETLNested
-else
-    CLASS_NAME=BQETLSimple 
-fi
-
-check_required_parameter () {
-  if [ _$1 == _ ]
-  then
+check_required_value() {
+  if [ _$1 == _ ]; then
     echo "$2 was not provided"
     exit
   fi
 }
 
+check_required_value "$PROJECT_ID" PROJECT_ID
+check_required_value "$DATASET" DATASET
+check_required_value "$DESTINATION_TABLE" DESTINATION_TABLE
+check_required_value "$REGION" REGION
+check_required_value "$SERVICE_ACCOUNT" SERVICE_ACCOUNT
+check_required_value "$DATAFLOW_TEMP_BUCKET" DATAFLOW_TEMP_BUCKET
 
-check_required_parameter "$PROJECT_ID" PROJECT_ID
-check_required_parameter "$DATASET" DATASET
-check_required_parameter "$DESTINATION_TABLE" DESTINATION_TABLE
-check_required_parameter "$REGION" REGION
-
+echo "Executing: "
+set -x
 
 mvn compile exec:java -e \
   -Dexec.mainClass=com.google.cloud.bqetl.${CLASS_NAME} \
@@ -43,10 +56,12 @@ mvn compile exec:java -e \
     --project=${PROJECT_ID} \
     --loadingBucketURL=gs://solutions-public-assets/bqetl  \
     --runner=DataflowRunner \
-    --jobName=etl-into-bigquery-${CLASS_NAME} \
-    --numWorkers=10 \
-    --maxNumWorkers=20 \
+    --numWorkers=5 \
+    --maxNumWorkers=10 \
     --bigQueryTablename=${PROJECT_ID}:${DATASET}.${DESTINATION_TABLE} \
     --region=${REGION} \
+    --serviceAccount=${SERVICE_ACCOUNT} \
+    --gcpTempLocation=${DATAFLOW_TEMP_BUCKET}/dftemp/ \
+    --tempLocation=${DATAFLOW_TEMP_BUCKET}/temp/ \
+    ${USE_LOOKUPS} \
     "
-

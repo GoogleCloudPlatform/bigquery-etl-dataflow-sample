@@ -38,4 +38,11 @@ public interface BQETLOptions extends PipelineOptions {
   Boolean getOverwriteBigQueryTable();
 
   void setOverwriteBigQueryTable(Boolean overwriteBigQueryTable);
+
+  @Description("Perform lookups for gender and area")
+  @Default.Boolean(false)
+  Boolean getPerformLookups();
+
+  void setPerformLookups(Boolean performLookups);
+
 }

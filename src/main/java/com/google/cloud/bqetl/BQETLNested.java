@@ -39,9 +39,9 @@ public class BQETLNested {
     /*
      * get the custom options
      */
-    BQETLOptions BQETLOptions =
+    BQETLOptions options =
         PipelineOptionsFactory.fromArgs(args).withValidation().as(BQETLOptions.class);
-    Pipeline p = Pipeline.create(BQETLOptions);
+    Pipeline p = Pipeline.create(options);
 
     /*
      * load the line delimited JSON into keyed PCollections
@@ -85,7 +85,7 @@ public class BQETLNested {
       tableRows.apply(
           "Write to BigQuery",
           BigQueryIO.writeTableRows()
-              .to(BQETLOptions.getBigQueryTablename())
+              .to(options.getBigQueryTablename())
               .withSchema(bqTableSchema)
               .withWriteDisposition(BigQueryIO.Write.WriteDisposition.WRITE_TRUNCATE)
               .withCreateDisposition(BigQueryIO.Write.CreateDisposition.CREATE_IF_NEEDED));
