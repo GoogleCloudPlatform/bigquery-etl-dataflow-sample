@@ -1,12 +1,12 @@
 /*
- * Copyright 2019 Google LLC
- * 
+ * Copyright 2022 Google LLC
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     https://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,13 +18,10 @@ package com.google.cloud.bqetl.mbschema;
 
 import com.google.api.services.bigquery.model.TableFieldSchema;
 import com.google.api.services.bigquery.model.TableSchema;
-
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Convenience Builder class for building a list of TableFieldSchema's
- */
+/** Convenience Builder class for building a list of TableFieldSchema's */
 public class FieldSchemaListBuilder {
 
   public static final String INTEGER = "INTEGER";
@@ -36,18 +33,16 @@ public class FieldSchemaListBuilder {
   public static final String NULLABLE = "NULLABLE";
   public static final String REPEATED = "REPEATED";
 
-  List<TableFieldSchema> schemaFields = new ArrayList<TableFieldSchema>();
+  final List<TableFieldSchema> schemaFields = new ArrayList<>();
 
-  /**
-   * Factory method returns a new FieldSchemaListBuilder.
-   */
+  /** Factory method returns a new FieldSchemaListBuilder. */
   public static FieldSchemaListBuilder create() {
     return new FieldSchemaListBuilder();
   }
 
   /**
-   * Creates a record TableSchemaField out of the given list and returns it so that it may be added to another
-   * FieldSchemaListBuilder
+   * Creates a record TableSchemaField out of the given list and returns it so that it may be added
+   * to another FieldSchemaListBuilder
    */
   public TableFieldSchema fieldSchema(FieldSchemaListBuilder list) {
     TableFieldSchema tfs = new TableFieldSchema();
@@ -58,23 +53,24 @@ public class FieldSchemaListBuilder {
 
   /**
    * Creates and returns a TableFieldSchema with the given parameters.
+   *
    * @param type - the datatype @see https://cloud.google.com/bigquery/data-types
    * @param name - the name of the field
    * @param mode - the mode of the field
-   * @see https://developers.google.com/resources/api-libraries/documentation/bigquery/v2/java/latest/com/google/api/services/bigquery/model/TableFieldSchema.html
-   **/
+   * @see TableFieldSchema
+   */
   public TableFieldSchema fieldSchema(String type, String name, String mode) {
     return fieldSchema(type, name, mode, "");
   }
 
   /**
-   * Creates a TableFieldSchema with all of the parameters
+   * Creates a TableFieldSchema with all the parameters
+   *
    * @param type - the datatype @see https://cloud.google.com/bigquery/data-types
    * @param name - the name of the field
    * @param mode - the mode of the field
    * @param description - a description of the field to create.
-   * @see https://developers.google.com/resources/api-libraries/documentation/bigquery/v2/java/latest/com/google/api/services/bigquery/model/TableFieldSchema.html
-   * @return
+   * @see TableFieldSchema * @return
    */
   public TableFieldSchema fieldSchema(String type, String name, String mode, String description) {
     TableFieldSchema tfs = new TableFieldSchema();
@@ -86,121 +82,120 @@ public class FieldSchemaListBuilder {
   }
 
   /**
-   * Convienence method for builder that constructs an INTEGER type field and adds it to the
+   * Convenience method for builder that constructs an INTEGER type field and adds it to the
    * FieldSchemaListBuilder's list of fields.
+   *
    * @param name - the name of the field
    * @param mode the mode of the field
    * @param description a description of the field
-   * @see https://developers.google.com/resources/api-libraries/documentation/bigquery/v2/java/latest/com/google/api/services/bigquery/model/TableFieldSchema.html
-   * @return this
+   * @see TableFieldSchema * @return this
    */
   public FieldSchemaListBuilder intField(String name, String mode, String description) {
     schemaFields.add(fieldSchema(INTEGER, name, mode, description));
     return this;
   }
   /**
-   * Convienence method for builder that constructs an INTEGER type field with an empty description and adds it to the
-   * FieldSchemaListBuilder's list of fields.
+   * Convenience method for builder that constructs an INTEGER type field with an empty description
+   * and adds it to the FieldSchemaListBuilder's list of fields.
+   *
    * @param name - the name of the field
    * @param mode the mode of the field
-   * @see https://developers.google.com/resources/api-libraries/documentation/bigquery/v2/java/latest/com/google/api/services/bigquery/model/TableFieldSchema.html
-   * @return this
+   * @see TableFieldSchema * @return this
    */
   public FieldSchemaListBuilder intField(String name, String mode) {
     return intField(name, mode, "");
   }
   /**
-   * Convienence method for builder that constructs an INTEGER type field with an empty description and Nullable mode
-   * adds it to the FieldSchemaListBuilder's list of fields.
+   * Convenience method for builder that constructs an INTEGER type field with an empty description
+   * and Nullable mode adds it to the FieldSchemaListBuilder's list of fields.
+   *
    * @param name - the name of the field
-   * @see https://developers.google.com/resources/api-libraries/documentation/bigquery/v2/java/latest/com/google/api/services/bigquery/model/TableFieldSchema.html
-   * @return this
+   * @see TableFieldSchema * @return this
    */
   public FieldSchemaListBuilder intField(String name) {
     return intField(name, NULLABLE);
   }
 
   /**
-   * Convienence method for builder that constructs an STRING type field with the given parameters
+   * Convenience method for builder that constructs an STRING type field with the given parameters
    * adds it to the FieldSchemaListBuilder's list of fields.
+   *
    * @param name - the name of the field
-   * @param - mode the mode of the field
-   * @param - description the description for the field.
-   * @see https://developers.google.com/resources/api-libraries/documentation/bigquery/v2/java/latest/com/google/api/services/bigquery/model/TableFieldSchema.html
-   * @return this
+   * @param mode the mode of the field
+   * @param description the description for the field.
+   * @see TableFieldSchema * @return this
    */
   public FieldSchemaListBuilder stringField(String name, String mode, String description) {
     schemaFields.add(fieldSchema(STRING, name, mode, description));
     return this;
   }
   /**
-   * Convienence method for builder that constructs an STRING type field with the given parameters
+   * Convenience method for builder that constructs an STRING type field with the given parameters
    * adds it to the FieldSchemaListBuilder's list of fields.
+   *
    * @param name - the name of the field
-   * @param - mode the mode of the field
-   * @param - description the description for the field.
-   * @see https://developers.google.com/resources/api-libraries/documentation/bigquery/v2/java/latest/com/google/api/services/bigquery/model/TableFieldSchema.html
-   * @return this
+   * @param mode the mode of the field
+   * @see TableFieldSchema * @return this
    */
   public FieldSchemaListBuilder stringField(String name, String mode) {
     return stringField(name, mode, "");
   }
   /**
-   * Convienence method for builder that constructs an STRING type field with the given parameters
+   * Convenience method for builder that constructs an STRING type field with the given parameters
    * adds it to the FieldSchemaListBuilder's list of fields.
+   *
    * @param name - the name of the field
-   * @param - mode the mode of the field
-   * @param - description the description for the field.
-   * @see https://developers.google.com/resources/api-libraries/documentation/bigquery/v2/java/latest/com/google/api/services/bigquery/model/TableFieldSchema.html
-   * @return this
+   * @see TableFieldSchema * @return this
    */
   public FieldSchemaListBuilder stringField(String name) {
     return stringField(name, NULLABLE);
   }
 
   /**
-   * Convienence method for builder that constructs an BOOLEAN type field with the given parameters
+   * Convenience method for builder that constructs an BOOLEAN type field with the given parameters
    * adds it to the FieldSchemaListBuilder's list of fields.
+   *
    * @param name - the name of the field
-   * @param - mode the mode of the field
-   * @param - description the description for the field.
-   * @see https://developers.google.com/resources/api-libraries/documentation/bigquery/v2/java/latest/com/google/api/services/bigquery/model/TableFieldSchema.html
-   * @return this
+   * @param mode the mode of the field
+   * @param description the description for the field.
+   * @see TableFieldSchema * @return this
    */
   public FieldSchemaListBuilder boolField(String name, String mode, String description) {
     schemaFields.add(fieldSchema(BOOLEAN, name, mode, description));
     return this;
   }
   /**
-   * Convenience method for builder that constructs a Boolean type field with the given name and NULLABLE mode adds
-   * it to the builder's list and returns the builder.
+   * Convenience method for builder that constructs a Boolean type field with the given name and
+   * NULLABLE mode adds it to the builder's list and returns the builder.
+   *
    * @param name - name of the field.
    * @param mode - the mode for the field.
-   * @see https://developers.google.com/resources/api-libraries/documentation/bigquery/v2/java/latest/com/google/api/services/bigquery/model/TableFieldSchema.html
-   * @return this
+   * @see TableFieldSchema * @return this
    */
   public FieldSchemaListBuilder boolField(String name, String mode) {
     return boolField(name, mode, "");
   }
 
   /**
-   *  Convenience method for builder that constructs a Boolean type field with the given name and NULLABLE mode adds
-   *  it to the builder's list and returns the builder.
-   *  @param name - the name of the field
-   *  @see https://developers.google.com/resources/api-libraries/documentation/bigquery/v2/java/latest/com/google/api/services/bigquery/model/TableFieldSchema.html
-   *  @return this
+   * Convenience method for builder that constructs a Boolean type field with the given name and
+   * NULLABLE mode adds it to the builder's list and returns the builder.
+   *
+   * @param name - the name of the field
+   * @see TableFieldSchema
+   * @return this
    */
   public FieldSchemaListBuilder boolField(String name) {
     return boolField(name, NULLABLE);
   }
 
   /**
-   * Convienence method for builder that constructs an Timestamp type field with the given parameters
+   * Convenience method for builder that constructs a Timestamp type field with the given parameters
    * adds it to the FieldSchemaListBuilder's list of fields.
+   *
    * @param name - the name of the field
-   * @param - mode the mode of the field
-   * @param - description the description for the field.
-   * @see https://developers.google.com/resources/api-libraries/documentation/bigquery/v2/java/latest/com/google/api/services/bigquery/model/TableFieldSchema.html
+   * @param mode the mode of the field
+   * @param description the description for the field.
+   * @see TableFieldSchema
    * @return this
    */
   public FieldSchemaListBuilder timestampField(String name, String mode, String description) {
@@ -209,10 +204,12 @@ public class FieldSchemaListBuilder {
   }
 
   /**
-   * Adds a timestamp field to the builder's list with the given name and mode and returns the builder.
+   * Adds a timestamp field to the builder's list with the given name and mode and returns the
+   * builder.
+   *
    * @param name - name of the field
    * @param mode - mode for the timestamp field
-   * @see https://developers.google.com/resources/api-libraries/documentation/bigquery/v2/java/latest/com/google/api/services/bigquery/model/TableFieldSchema.html
+   * @see TableFieldSchema
    * @return this
    */
   public FieldSchemaListBuilder timestampField(String name, String mode) {
@@ -220,25 +217,29 @@ public class FieldSchemaListBuilder {
   }
 
   /**
-   * Creates a timestampField with a NULLABLE mode adds it to the builder's list and returns the builder
+   * Creates a timestampField with a NULLABLE mode adds it to the builder's list and returns the
+   * builder
+   *
    * @param name - name of the TableFieldSchema
    * @return this
-   * */
+   */
   public FieldSchemaListBuilder timestampField(String name) {
     return timestampField(name, NULLABLE);
   }
 
   /**
    * This adds the field to the FieldSchemaListBuilders list of fields
-   * @param - field a TableFieldSchema to add to the list.
+   *
+   * @param field a TableFieldSchema to add to the list.
    */
   public FieldSchemaListBuilder field(TableFieldSchema field) {
     schemaFields.add(field);
     return this;
   }
   /**
-   *  Returns a new repeated record field.
-   *  @param name the name of the field.
+   * Returns a new repeated record field.
+   *
+   * @param name the name of the field.
    */
   public TableFieldSchema repeatedRecord(String name) {
     TableFieldSchema tfs = fieldSchema(this);
@@ -249,6 +250,7 @@ public class FieldSchemaListBuilder {
 
   /**
    * Returns a TableSchema for this list of fields.
+   *
    * @return the BigQuery TableSchema object for this list of fields
    */
   public TableSchema schema() {
