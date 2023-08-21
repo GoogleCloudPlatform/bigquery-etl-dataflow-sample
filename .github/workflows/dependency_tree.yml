@@ -1,0 +1,2 @@
+- name: Submit Dependency Snapshot
+  uses: advanced-security/maven-dependency-submission-action@v3
