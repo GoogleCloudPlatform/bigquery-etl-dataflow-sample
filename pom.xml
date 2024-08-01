@@ -26,7 +26,7 @@
     <beam-version>2.56.0</beam-version>
     <slf4j.version>2.0.13</slf4j.version>
     <junit.version>4.13.2</junit.version>
-    <hamcrest.version>2.2</hamcrest.version>
+    <hamcrest.version>3.0</hamcrest.version>
   </properties>
   <build>
     <plugins>
