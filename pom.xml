@@ -101,6 +101,12 @@
       <artifactId>beam-sdks-java-io-google-cloud-platform</artifactId>
       <version>${beam-version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.beam</groupId>
+      <artifactId>beam-sdks-java-testing</artifactId>
+      <version>${beam-version}</version>
+      <scope>test</scope>
+    </dependency>
     <!-- slf4j API frontend binding with JUL backend -->
     <dependency>
       <groupId>org.slf4j</groupId>
